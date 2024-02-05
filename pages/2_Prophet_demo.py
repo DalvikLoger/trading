@@ -8,7 +8,7 @@ df = pd.read_csv('goldstock.csv')
 df = df.drop('Unnamed: 0', axis=1)
 df['Date'] = pd.to_datetime(df['Date'])
 
-st.write("# Prediction avec Prophet")
+st.title("# Prediction with Prophet")
 
 # Prepare data for Prophet
 df_close = df[['Date', 'Close']]
@@ -30,19 +30,18 @@ fig_forecast = model_close.plot(forecast_close, figsize=(15, 9), xlabel='Date', 
 # Display the chart in Streamlit
 st.pyplot(fig_forecast)
 
-# Plot components using a custom Plotly figure
-fig_components = go.Figure()
+fig_predicted = go.Figure()
 
-one_year_forecast = forecast_close[forecast_close['ds'].dt.year == 2023]
+predicted_forecast = forecast_close[forecast_close['ds'].dt.year == 2024]
 
 # Predict seasonal components for one year
-one_year_seasonal_component = model_close.predict_seasonal_components(one_year_forecast)
+predicted_seasonal_component = model_close.predict_seasonal_components(predicted_forecast)
 
 # Plot the seasonal component for one year
-fig_one_year_component = go.Figure()
-fig_one_year_component.add_trace(go.Scatter(x=one_year_forecast['ds'], y=one_year_seasonal_component['yearly'], mode='lines', name='Seasonal'))
+predicted_year_component = go.Figure()
+predicted_year_component.add_trace(go.Scatter(x=predicted_forecast['ds'], y=predicted_seasonal_component['yearly'], mode='lines', name='Seasonal'))
 
-fig_one_year_component.update_layout(title=f'Prophet Seasonal Component for {2023}', xaxis_title='Date', yaxis_title='Seasonal Component Value')
+predicted_year_component.update_layout(title=f'Prophet Seasonal Component for {2024}', xaxis_title='Date', yaxis_title='Seasonal Component Value')
 
 # Display the components chart for one year in Streamlit
-st.plotly_chart(fig_one_year_component)
+st.plotly_chart(predicted_year_component)

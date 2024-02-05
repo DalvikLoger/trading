@@ -12,9 +12,6 @@ from plotly import tools
 import chart_studio.plotly as py
 from plotly.offline import init_notebook_mode, iplot
 init_notebook_mode(connected=True)
-import plotly.graph_objs as go
-import plotly.figure_factory as ff
-import statsmodels.api as sm
 from numpy.random import normal, seed
 from scipy.stats import norm
 import math
@@ -31,8 +28,6 @@ df['Date'] = pd.to_datetime(df['Date'])
 EPOCHS = 10
 BATCH_SIZE = 32
 TIMESTEP = 60
-
-st.write("# Test of Prediction with a LSTM model")
 
 def populate_missing_date_values(df):
     start_date = df['Date'][0].date()
@@ -103,64 +98,52 @@ df = populate_missing_date_values(df)
 # create a dataframe with only Date and Open columns
 df = pd.DataFrame(df, columns=['Date', 'Open'])
 
-train_df = df.head(len(df) - 19)
-test_df = df.tail(19)
-test_df.reset_index(drop=True, inplace=True)
-X_train = train_df.iloc[:, 1:2].values
+df['Date'] = pd.to_datetime(df['Date'])
+df.set_index('Date', inplace=True)
 
-sc = MinMaxScaler(feature_range=(0, 1))
+airpass_ma = df.rolling(window = 12, center = True).mean()
+dflog = np.log(df)
+st.title('Moving average and Autocorrelation')
 
-# fit the scaler only on X_train
-sc.fit(X_train)
+# Plot the original data and moving average using Matplotlib
+plt.figure(figsize=(10, 6))
+plt.plot(df, color='blue', label='Origine')
+plt.plot(airpass_ma, color='red', label='Moving Average')
+plt.legend()
+plt.title('Moving Average')
 
-# scale X_train values to between 0 and 1
-X_train_scaled = sc.transform(X_train)
-train_data = []
-train_labels = []
+# Display the plot using Streamlit
+st.pyplot(plt)
 
-# create the training data using 60 timesteps
-for i in range(TIMESTEP, len(X_train_scaled)):
-    train_data.append(X_train_scaled[i-TIMESTEP:i, 0])
-    train_labels.append(X_train_scaled[i, 0])
+ax = pd.plotting.autocorrelation_plot(dflog)
+years_to_show = [2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]
+ax.set_xticklabels(years_to_show, ha='right')
 
-# convert train_data and train_labels back into numpy arrays
-train_data, train_labels = np.array(train_data), np.array(train_labels)
+st.pyplot()
 
-# reshape train_data to be 3D so its compatible with the RNNs input requirements
-train_data = np.reshape(train_data, (train_data.shape[0], train_data.shape[1], 1))
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,7)) # Création de la figure et des axes
 
-regressor = load_model('regressor_trading.h5')
+dflog_1 = dflog.diff().dropna() # Différenciation ordre 1
 
-last_60_days_2023 = train_df.iloc[:, 1:2].tail(TIMESTEP)
-last_60_days_2023 = pd.concat([last_60_days_2023, test_df.iloc[:, 1:2]])
-last_60_days_2023 = sc.transform(last_60_days_2023)
+dflog_1.plot(ax = ax1) #Série temporelle différenciée
 
-X_test = []
-for i in range(TIMESTEP, 79):
-    X_test.append(last_60_days_2023[i-TIMESTEP:i, 0])
+pd.plotting.autocorrelation_plot(dflog_1, ax = ax2); #Autocorrélogramme de la série différenciée
+st.pyplot(fig)
 
-X_test = np.array(X_test)
-X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,7)) #Création de la figure et des axes
 
-predicted_value = regressor.predict(X_test)
-predicted_value = sc.inverse_transform(predicted_value)
+dflog_2 = dflog_1.diff(periods = 12).dropna() #Différenciation d'ordre 12
 
-fig_train = plt.figure(figsize=(15, 9))
+dflog_2.plot(ax = ax1) #Série doublement différenciée
 
-plt.plot(train_df['Date'], train_df['Open'], color='red')
-plt.title('Gold Stock Price Train')
-plt.xlabel('Date')
-plt.ylabel('Open Price')
-plt.legend(['Train', 'Test', 'Prediction'], loc='lower right')
-st.pyplot(fig_train)
+pd.plotting.autocorrelation_plot(dflog_2, ax = ax2); #Autocorrélogramme de la série
+st.pyplot(fig)
 
-fig_prediction = plt.figure(figsize=(15, 9))
-plt.plot(test_df['Date'], test_df['Open'], color='blue')
-plt.plot(test_df['Date'], predicted_value, color='green')
-plt.title('Gold Stock Price Prediction')
-plt.xlabel('Date')
-plt.ylabel('Open Price')
-plt.legend(['Train', 'Test', 'Prediction'], loc='lower right')
+from statsmodels.graphics.tsaplots import plot_pacf, plot_acf
 
-# Display the plot in Streamlit
-st.pyplot(fig_prediction)
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,7))
+
+plot_acf(dflog_2, lags = 36, ax=ax1)
+plot_pacf(dflog_2, lags = 36, ax=ax2)
+plt.show()
+st.pyplot(fig)
