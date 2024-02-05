@@ -17,6 +17,6 @@ st.markdown(
     **👈 Select a demo from the sidebar** to see some examples
     of what Tradin App can do!
     ### Want to learn more?
-    - Explore more project [streamlit.io](https://www.gitlab.com/DalvikLoger)
+    - Explore more project [gitlab.com/DalvikLoger](https://www.gitlab.com/DalvikLoger)
 """)
 
