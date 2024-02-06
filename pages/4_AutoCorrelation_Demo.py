@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import datetime
+import plotly.express as px
+from statsmodels.tsa.seasonal import seasonal_decompose
 
 df = pd.read_csv('goldstock.csv')
 df = df.drop('Unnamed: 0', axis=1)
@@ -80,28 +82,27 @@ df = populate_missing_date_values(df)
 # create a dataframe with only Date and Open columns
 df = pd.DataFrame(df, columns=['Date', 'Open'])
 
-df['Date'] = pd.to_datetime(df['Date'])
+df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d')
 df.set_index('Date', inplace=True)
 
-airpass_ma = df.rolling(window = 12, center = True).mean()
 dflog = np.log(df)
+airpass_ma = df.rolling(window = 120, center = True).mean()
 st.title('Moving average and Autocorrelation')
-
+st.write("The moving average allows us to identify the trend which is increasing in our case.")
 # Plot the original data and moving average using Matplotlib
 plt.figure(figsize=(10, 6))
 plt.plot(df, color='blue', label='Origine')
 plt.plot(airpass_ma, color='red', label='Moving Average')
 plt.legend()
 plt.title('Moving Average')
-
-# Display the plot using Streamlit
 st.pyplot(plt)
 
+st.write("One of the limitations of the ARMA model is that it can only model stationary processes. To see if a series is stationary, we can look at its autocorrelation diagram. For a stationary process, the simple autocorrelation decreases rapidly towards 0.")
 ax = pd.plotting.autocorrelation_plot(dflog)
-years_to_show = [2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]
-ax.set_xticklabels(years_to_show, ha='right')
-
+lag = [20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220]
+ax.set_xticklabels(lag, ha='right')
 st.pyplot()
+st.write("We see that the decay of the autocorrelation function is relatively slow. We therefore apply a differentiation of order 1 to our time series in order to see if this allows us to stationarize it.")
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,7)) # Création de la figure et des axes
 
@@ -111,6 +112,7 @@ dflog_1.plot(ax = ax1) #Série temporelle différenciée
 
 pd.plotting.autocorrelation_plot(dflog_1, ax = ax2); #Autocorrélogramme de la série différenciée
 st.pyplot(fig)
+st.write("The simple autocorrelation seems to tend towards 0 but has significant seasonal peaks (We can also see its seasonal patterns directly in the series graph). We will therefore differentiate the time series in such a way as to eliminate seasonality preventing stationarity (no rapid decay towards zero yet)")
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,7)) #Création de la figure et des axes
 
@@ -120,7 +122,9 @@ dflog_2.plot(ax = ax1) #Série doublement différenciée
 
 pd.plotting.autocorrelation_plot(dflog_2, ax = ax2); #Autocorrélogramme de la série
 st.pyplot(fig)
-
+st.write("We arrive here at a fairly satisfactory result despite the few irregular peaks")
+st.subheader("SARIMA model")
+st.write("The blue zone represents the zone of non-significance of the autocorrelations, this means that for the autocorrelations in this zone: they are not significantly different from 0 from a statistical point of view.")
 from statsmodels.graphics.tsaplots import plot_pacf, plot_acf
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,7))
@@ -129,3 +133,6 @@ plot_acf(dflog_2, lags = 36, ax=ax1)
 plot_pacf(dflog_2, lags = 36, ax=ax2)
 plt.show()
 st.pyplot(fig)
+
+st.write("We notice that the first peak has a value of 1, in fact it corresponds to a zero shift and therefore serves as a scale for the rest of the autocorrelogram.")
+st.write("We notice that both the simple and partial autocorrelation tend towards 0 (apart from seasonal peaks), there does not seem to be any particular cut. We can therefore assume an ARMA(𝑝,𝑞) process. We will therefore start by estimating the non-seasonal part of our time series via an ARMA(1,1).")
