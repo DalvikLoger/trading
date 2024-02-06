@@ -4,11 +4,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import datetime
-from plotly.offline import init_notebook_mode, iplot
+from plotly.offline import init_notebook_mode
 init_notebook_mode(connected=True)
 import tensorflow as tf
 from sklearn.preprocessing import MinMaxScaler
-from tensorflow.keras.models import Sequential, load_model
+from tensorflow.keras.models import load_model
 
 df = pd.read_csv('goldstock.csv')
 df = df.drop('Unnamed: 0', axis=1)
