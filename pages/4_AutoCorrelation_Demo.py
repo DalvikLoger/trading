@@ -4,12 +4,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import datetime
-from plotly import tools
-import chart_studio.plotly as py
 from plotly.offline import init_notebook_mode, iplot
 init_notebook_mode(connected=True)
-from numpy.random import normal, seed
-from scipy.stats import norm
 import math
 from sklearn.metrics import mean_squared_error
 import matplotlib.dates as mdate

@@ -5,10 +5,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-# Above is a special style template for matplotlib, highly useful for visualizing time series data
-from pylab import rcParams
-from plotly import tools
-import chart_studio.plotly as py
 from plotly.offline import init_notebook_mode, iplot
 init_notebook_mode(connected=True)
 import plotly.graph_objs as go
