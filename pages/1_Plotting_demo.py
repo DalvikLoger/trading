@@ -2,9 +2,6 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from plotly.offline import init_notebook_mode
-init_notebook_mode(connected=True)
-import plotly.figure_factory as ff
 import statsmodels.api as sm
 from numpy.random import normal, seed
 from scipy.stats import norm
