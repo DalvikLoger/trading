@@ -3,8 +3,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import datetime
-from plotly.offline import init_notebook_mode
-init_notebook_mode(connected=True)
 
 df = pd.read_csv('goldstock.csv')
 df = df.drop('Unnamed: 0', axis=1)
