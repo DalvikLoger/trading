@@ -1,7 +1,4 @@
-python
-request
 prophet
-streamlit
 pandas
 numpy
 seaborn
