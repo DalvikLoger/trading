@@ -1,0 +1,13 @@
+python
+request
+prophet
+streamlit
+pandas
+numpy
+seaborn
+matplotlib 
+plotly
+scikit-learn
+tensorflow
+datetime
+

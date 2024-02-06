@@ -1,25 +1,11 @@
 import streamlit as st
-import os
-import warnings
 import numpy as np 
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import datetime
-# Above is a special style template for matplotlib, highly useful for visualizing time series data
-from pylab import rcParams
-from plotly import tools
-import chart_studio.plotly as py
 from plotly.offline import init_notebook_mode, iplot
 init_notebook_mode(connected=True)
-import plotly.graph_objs as go
-import plotly.figure_factory as ff
-import statsmodels.api as sm
-from numpy.random import normal, seed
-from scipy.stats import norm
-import math
-from sklearn.metrics import mean_squared_error
-import matplotlib.dates as mdate
 import tensorflow as tf
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import Sequential, load_model
