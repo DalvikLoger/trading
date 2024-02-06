@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import statsmodels.api as sm
 from numpy.random import normal, seed
 from scipy.stats import norm
 
