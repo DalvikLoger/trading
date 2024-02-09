@@ -98,10 +98,11 @@ plt.title('Moving Average')
 st.pyplot(plt)
 
 st.write("One of the limitations of the ARMA model is that it can only model stationary processes. To see if a series is stationary, we can look at its autocorrelation diagram. For a stationary process, the simple autocorrelation decreases rapidly towards 0.")
+fig, ax = plt.subplots()
 ax = pd.plotting.autocorrelation_plot(dflog)
 lag = [20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220]
 ax.set_xticklabels(lag, ha='right')
-st.pyplot()
+st.pyplot(fig)
 st.write("We see that the decay of the autocorrelation function is relatively slow. We therefore apply a differentiation of order 1 to our time series in order to see if this allows us to stationarize it.")
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,7)) # Création de la figure et des axes

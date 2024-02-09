@@ -45,3 +45,16 @@ predicted_year_component.update_layout(title=f'Prophet Seasonal Component for {2
 
 # Display the components chart for one year in Streamlit
 st.plotly_chart(predicted_year_component)
+
+# Calculate percentage change
+actual_data_2023 = df[df['Date'].dt.year == 2023]['Close']
+
+min_length = min(len(actual_data_2023), len(predicted_forecast))
+
+# Calculate percentage change using the common length
+percentage_change = ((predicted_forecast['yhat'].values[:min_length] - actual_data_2023.values[:min_length]) / actual_data_2023.values[:min_length]) * 100
+
+percentage_change_list = percentage_change.tolist()
+formatted_list = ["{:.2f}%".format(item) for item in percentage_change_list]
+
+st.subheader(f"Percentage Change in Rating for 2024: {formatted_list[-1]}")
