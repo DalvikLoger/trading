@@ -146,3 +146,74 @@ plt.legend(['Train', 'Test', 'Prediction'], loc='lower right')
 
 # Display the plot in Streamlit
 st.pyplot(fig_prediction)
+
+df['Date'] = pd.to_datetime(df['Date'])
+
+last_date = df['Date'].max()  # Assuming 'Date' is your datetime column
+
+# Generate future dates for the year 2024
+future_dates = pd.date_range(last_date, periods=305 + 1, freq='D')[1:]
+
+# Create a DataFrame with the future dates
+future_df = pd.DataFrame({'Date': future_dates})
+
+# Transform the future data using the same scaler used during training (if needed)
+actual_data_2024 = sc.transform(future_df[['Date']])
+
+X_predict = []
+y_actual = []
+
+# Assuming your TIMESTEP is the number of time steps used during training
+# and actual_data_2024 has shape (n, 1)
+for i in range(TIMESTEP, len(actual_data_2024)):
+    X_sample = actual_data_2024[i - TIMESTEP:i]
+    X_predict.append(X_sample)
+
+X_predict = np.array(X_predict)
+
+# Ensure X_predict has the right shape for prediction
+# It should have shape (number_of_samples, TIMESTEP, 1)
+X_predict = np.reshape(X_predict, (X_predict.shape[0], X_predict.shape[1], 1))
+st.write(f"X_predict shape: {X_predict.shape}")
+
+# Ensure that regressor is a compatible model for your data
+predicted_value_2024 = regressor.predict(X_predict)
+st.write(f"Predicted shape: {predicted_value_2024.shape}")
+# Inverse transform the predicted values
+predicted_value_2024 = sc.inverse_transform(predicted_value_2024)
+
+# Create a DataFrame for predicted values
+predicted_df_2024 = pd.DataFrame({'Date': future_dates[TIMESTEP:], 'Predicted': predicted_value_2024.flatten()})
+st.write(predicted_df_2024.shape)
+
+# Ensure that the shapes match
+shape = len(predicted_df_2024['Predicted']), len(actual_data_2024)
+st.write(shape)
+# Plotting actual data and predicted values
+plt.figure(figsize=(10, 6))
+plt.plot(predicted_df_2024['Date'], predicted_df_2024['Predicted'], label='Predicted Data')
+plt.xlabel('Date')
+plt.ylabel('Close Price')
+plt.title('Predicted Data for 2024')
+plt.legend()
+plt.show()
+st.pyplot(plt)
+# Calculate percentage change
+actual_data_2023 = df[df['Date'].dt.year == 2023]['Open']
+min_length = min(len(predicted_df_2024['Predicted']), len(actual_data_2023))
+predicted_df_2024 = predicted_df_2024.head(min_length)
+actual_data_2023 = actual_data_2023.head(min_length)
+percentage_change_2024 = ((predicted_df_2024['Predicted'].values - actual_data_2023.values) / actual_data_2023.values) * 100
+percentage_change_l = percentage_change_2024.tolist()
+formatted_list_2024 = ["{:.2f}%".format(item) for item in percentage_change_l]
+
+st.subheader(f"Percentage Change in Rating for 2024: {formatted_list_2024[-1]}")
+# Plotting percentage change
+plt.figure(figsize=(8, 5))
+plt.plot(predicted_df_2024['Date'], percentage_change_2024, label='Percentage Change')
+plt.xlabel('Date')
+plt.ylabel('Percentage Change')
+plt.title('Percentage Change in Rating for 2024')
+plt.legend()
+plt.show()
+st.pyplot(plt)

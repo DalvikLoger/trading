@@ -137,3 +137,55 @@ st.pyplot(fig)
 
 st.write("We notice that the first peak has a value of 1, in fact it corresponds to a zero shift and therefore serves as a scale for the rest of the autocorrelogram.")
 st.write("We notice that both the simple and partial autocorrelation tend towards 0 (apart from seasonal peaks), there does not seem to be any particular cut. We can therefore assume an ARMA(𝑝,𝑞) process. We will therefore start by estimating the non-seasonal part of our time series via an ARMA(1,1).")
+
+import statsmodels.api as sm
+import plotly.graph_objs as go
+import plotly.express as px
+
+# Assuming df has a datetime index and 'Open' column
+# If not, you can set the index using: df.set_index('Your_Date_Column', inplace=True)
+# Example: df.set_index('Date', inplace=True)
+# If 'Date' is already your index, no need to set it again.
+
+# Ensure the datetime index is set and has a frequency
+df.index = pd.to_datetime(df.index)
+
+# Handle duplicate indices by aggregating them (you can change this based on your needs)
+df = df.groupby(df.index).mean()  # Example: Take the mean for duplicates
+
+# Set the desired frequency, replace 'D' with your actual frequency
+df = df.asfreq('D')
+
+# Fit SARIMA model
+model = sm.tsa.SARIMAX(df['Open'], order=(1, 1, 1), seasonal_order=(0, 1, 1, 12))
+sarima = model.fit()
+
+# Generate forecast for the year 2024
+forecast_start = datetime.datetime(2024, 1, 1)
+forecast_end = datetime.datetime(2024, 12, 31)
+forecast_steps = (forecast_end - forecast_start).days + 1
+forecast_index = pd.date_range(start=forecast_start, end=forecast_end, freq='D')
+
+# Use integer indices for forecast predictions
+forecast_results = sarima.get_forecast(steps=forecast_steps)
+forecast_predictions = forecast_results.predicted_mean.values
+
+df['Percentage Change'] = df['Open'].pct_change() * 100
+
+last_open_value = df['Open'].iloc[-1]
+
+plt.figure(figsize=(10, 6))
+
+plt.plot(df.index, df['Open'], label='Original Data')
+plt.plot(forecast_index, forecast_predictions, label='Forecast for 2024')
+
+# Set labels and title
+plt.xlabel('Date')
+plt.ylabel('Open')
+plt.title('Original Data, Forecast, and Percentage Change in Ratings for 2024')
+
+# Display legend
+plt.legend(loc='upper left')
+plt.tight_layout()
+
+st.pyplot(plt)
