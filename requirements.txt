@@ -9,4 +9,3 @@ datetime
 plotly
 statsmodels
 alpha_vantage
-os
