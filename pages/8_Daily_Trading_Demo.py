@@ -16,7 +16,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Create a DataFrame
-df = pd.DataFrame(api_response['data'])
+df = pd.DataFrame(result['data'])
 
 # Convert 'date' column to datetime
 df['date'] = pd.to_datetime(df.date)
