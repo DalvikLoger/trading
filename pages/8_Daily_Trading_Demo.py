@@ -1,6 +1,6 @@
 import requests
 import streamlit as st
-key = marketstack
+key = MARKETSTACK
 params = {
   'access_key': key
 }
