@@ -1,6 +1,6 @@
 import requests
 import streamlit as st
-access_key = "719043332968522e49c78c03659df06e"
+access_key = MARKETSTACK
 symbols = 'AAPL'
 interval = "15min"
 fields = {'access_key': access_key, 'symbols': symbols, "interval": interval}

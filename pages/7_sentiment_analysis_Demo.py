@@ -1,4 +1,4 @@
-API_KEY = alpha_vantage
+API_KEY = ALPHA_VANTAGE
 import streamlit as st
 symbol = 'AAPL'
 import matplotlib.pyplot as plt
