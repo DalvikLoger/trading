@@ -1,6 +1,7 @@
 import requests
 import streamlit as st
-access_key = MARKETSTACK
+import os
+access_key = os.getenv("MARKETSTACK")
 symbols = 'AAPL'
 interval = "15min"
 fields = {'access_key': access_key, 'symbols': symbols, "interval": interval}
