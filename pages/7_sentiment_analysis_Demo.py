@@ -1,6 +1,7 @@
 import os
 API_KEY = os.getenv("ALPHA_VANTAGE")
 import streamlit as st
+import requests
 symbol = 'AAPL'
 import matplotlib.pyplot as plt
 from alpha_vantage.timeseries import TimeSeries 
