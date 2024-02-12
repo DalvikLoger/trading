@@ -1,12 +1,11 @@
 import requests
 import streamlit as st
-key = '719043332968522e49c78c03659df06e'
-params = {
-  'access_key': key
-}
-api_result = requests.get('http://api.marketstack.com/v1/eod?access_key=719043332968522e49c78c03659df06e&symbols=AAPL&interval=1min')
-
-api_response = api_result.json()
+access_key = "719043332968522e49c78c03659df06e"
+symbols = 'AAPL'
+interval = "15min"
+fields = {'access_key': access_key, 'symbols': symbols, "interval": interval}
+response = requests.get("http://api.marketstack.com/v1/eod", params=fields)
+result = response.json()
 
 import pandas as pd
 import matplotlib.pyplot as plt
