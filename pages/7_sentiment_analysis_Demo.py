@@ -4,22 +4,30 @@ symbol = 'AAPL'
 import matplotlib.pyplot as plt
 from alpha_vantage.timeseries import TimeSeries 
 st.title('Sentiment Analysis for Apple trend')
-try:
-    ts = TimeSeries(key=API_KEY, output_format='pandas')
-    data, meta_data = ts.get_intraday(symbol=symbol, interval='1min', outputsize='compact')
-    
-    # Display the data
-    st.dataframe(data)
+function = 'CURRENCY_EXCHANGE_RATE'
+symbol = 'IBM'
+interval = '1min'
 
-    # Plot the closing prices
-    plt.figure(figsize=(10, 6))
-    data['4. close'].plot(title=f'{symbol} Intraday Closing Prices (1 Minute Intervals)')
-    plt.xlabel('Time')
-    plt.ylabel('Close Price (USD)')
-    plt.show()
-    st.pyplot(plt)
-except ValueError as e:
-    st.write(f"Error: {e}")
+fields = {'key': API_KEY, 'function': function, 'symbol': symbol, 'interval': interval}
+response = requests.get("https://www.alphavantage.co", params=fields)
+ts = TimeSeries(key=API_KEY, output_format='pandas')
+
+from_currency='USD'
+symbol = 'AAPL'
+interval = '15min'
+data, meta_data = ts.get_intraday(symbol=symbol, interval=interval)
+st.dataframe(data)
+
+mean_100 = data['4. close'].rolling(window = 10, center = True).mean()
+mean_50 = data['4. close'].rolling(window = 5, center = True).mean()
+#Affichage de la série 
+plt.figure(figsize=(20,7))
+plt.plot(data['4. close'], color = 'blue', label = 'Origine')
+plt.plot(mean_100, color = 'red', label = 'Moyenne mobile Base 10')
+plt.plot(mean_50, color = 'green', label = 'Moyenne mobile Base 5')
+plt.fill_between(mean_100.index, mean_100, mean_50, where=(mean_100 > mean_50), interpolate=True, color='yellow', alpha=0.3, label='Difference Area')
+plt.legend()
+plt.title('Moyenne mobiles')
     
 import requests
 tickers = 'AAPL'
