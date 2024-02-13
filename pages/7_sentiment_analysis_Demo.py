@@ -1,14 +1,13 @@
 import os
-API_KEY = os.getenv("ALPHA_VANTAGE")
 import streamlit as st
 import requests
-symbol = 'AAPL'
 import matplotlib.pyplot as plt
 from alpha_vantage.timeseries import TimeSeries 
 st.title('Sentiment Analysis for Apple trend')
+API_KEY = st.secrets.get("ALPHA_VANTAGE", None)
 function = 'CURRENCY_EXCHANGE_RATE'
-symbol = 'IBM'
-interval = '1min'
+symbol = 'AAPL'
+interval = '15min'
 
 fields = {'key': API_KEY, 'function': function, 'symbol': symbol, 'interval': interval}
 response = requests.get("https://www.alphavantage.co", params=fields)
